@@ -1,0 +1,27 @@
+name: Deploy 'test-app'
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: test-app
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: pujux/landing-pages-11ty-poc-base
+          ref: main
+      - run: ls -al
+          
+      
+      
