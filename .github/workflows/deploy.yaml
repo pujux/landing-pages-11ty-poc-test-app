@@ -4,10 +4,7 @@ on:
   push:
     branches:
       - main
-
-permissions:
-  pages: write
-  id-token: write
+  workflow_dispatch:
 
 env: 
   NAME: test-app # Change this to the name of your page
@@ -31,22 +28,23 @@ jobs:
           image: puf17640/11ty-poc:latest
           options: -v /home/runner/work/landing-pages-11ty-poc-test-app/landing-pages-11ty-poc-test-app/${{ env.NAME }}:/app
           run: eleventy --output=/app/_site
-
-      - run: ls -la ./${{ env.NAME }}/_site
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./test-app/_site
+          path: ./${{ env.NAME }}/_site
 
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v2
     
