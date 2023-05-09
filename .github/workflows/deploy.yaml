@@ -7,7 +7,9 @@ on:
   workflow_dispatch:
 
 env: 
-  NAME: test-app # Change this to the name of your page
+  PAGE: test-app
+  BASE: pujux/landing-pages-11ty-poc-base
+  ELEVENTY_IMAGE: puf17640/11ty-poc:latest
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,20 +21,19 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          repository: pujux/landing-pages-11ty-poc-base
-          ref: main
+          repository: ${{ env.BASE }}
 
       - name: Build static site
         uses: addnab/docker-run-action@v3
         with:
-          image: puf17640/11ty-poc:latest
-          options: -v /home/runner/work/landing-pages-11ty-poc-test-app/landing-pages-11ty-poc-test-app/${{ env.NAME }}:/app
+          image: ${{ env.ELEVENTY_IMAGE }}
+          options: -v /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/${{ env.PAGE }}:/app
           run: eleventy --output=/app/_site
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./${{ env.NAME }}/_site
+          path: ./${{ env.PAGE }}/_site
 
   deploy:
     environment:
